@@ -58,7 +58,7 @@ export class LinkGeneratorService {
       where: { maskedUrl },
     };
     const link = await this.linkRepository.findMaskedUrl(param);
-    return link.redirectCount;
+    return { redirectCount: link.redirectCount, target: link.originalUrl };
   }
 
   async invalidateLink(maskedUrl: string) {

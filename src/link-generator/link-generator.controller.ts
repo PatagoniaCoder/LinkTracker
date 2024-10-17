@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { MaskedUrl } from './interfaces/masked-url';
@@ -13,9 +22,17 @@ export class LinkGeneratorController {
   }
 
   @Get(':id')
-  async redirect(@Param('id') id: string, @Res() res: Response) {
+  async redirect(
+    @Param('id') id: string,
+    @Query() query: string,
+    @Res() res: Response,
+  ) {
     const originalUrl = await this.linkGeneratorService.trackAndRedirect(id);
-    res.redirect(originalUrl);
+    const params = Object.keys(query).reduce((prev, acc, idx) => {
+      prev += `${acc}=${query[acc]}${Object.keys(query)[idx + 1] ? '&' : ''}`;
+      return prev;
+    }, '');
+    res.redirect(`${originalUrl}?${params}`);
   }
 
   @Get(':id/stats')

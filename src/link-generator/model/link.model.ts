@@ -12,7 +12,7 @@ export class LinkModel {
     this.id = uuid4();
     this.originalUrl = originalUrl;
     this.maskedUrl = uuid4().split('-')[0];
-    this.expirationDate = days().add(30, 's').toDate();
+    this.expirationDate = days().add(120, 's').toDate();
     this.isValid = true;
     this.redirectCount = 0;
   }
