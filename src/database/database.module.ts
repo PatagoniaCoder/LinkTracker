@@ -1,21 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { LinkEntity } from '../link-generator/entity/link.entity';
-import { DatabaseService } from './database.service';
-import { join } from 'path';
+import { LinkGeneratorRepository } from '../link-generator/repository/link-generator.repository';
+import { SqliteDatabaseModule } from './sqlite/sqlite-database.module';
+import { SqliteDatabaseService } from './sqlite/sqlite-database.service';
+import { MySqlDatabaseService } from './mysql/mysql-database.service';
+import { MySqlDatabaseModule } from './mysql/mysql-database.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'links.db',
-      entities: [join(__dirname, '../**/**/*.entity{.ts,.js}')],
-      synchronize: true,
-    }),
-    TypeOrmModule.forFeature([LinkEntity]),
+  imports: [MySqlDatabaseModule], // selectable MySqlDatabaseModule,
+  providers: [
+    { provide: LinkGeneratorRepository, useExisting: MySqlDatabaseService }, // selectable MySqlDatabaseService,
   ],
-
-  providers: [DatabaseService],
-  exports: [DatabaseService],
+  exports: [LinkGeneratorRepository],
 })
 export class DatabaseModule {}

@@ -5,12 +5,24 @@ import { LinkGeneratorService } from './link-generator.service';
 
 describe('LinkGeneratorController', () => {
   let controller: LinkGeneratorController;
+  const body = {
+    url: 'https://www.someSite.com',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LinkGeneratorController],
       providers: [
-        LinkGeneratorService,
+        {
+          provide: LinkGeneratorService,
+          useValue: {
+            generate: () => ({
+              target: body.url,
+              link: 'http://localhost:3000/link-generator/linkSample',
+              valid: true,
+            }),
+          },
+        },
         {
           provide: REQUEST,
           useValue: {
@@ -29,12 +41,8 @@ describe('LinkGeneratorController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create a valid link', () => {
-    const body = {
-      url: 'https://www.someSite.com',
-    };
-
-    const result = controller.create(body);
+  it('should create a valid link', async () => {
+    const result = await controller.create(body);
 
     expect(result).toEqual({
       target: body.url,

@@ -2,18 +2,19 @@ import { Inject, Injectable, NotFoundException, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import * as dayjs from 'dayjs';
 import { Request } from 'express';
-import { DatabaseService } from '../database/database.service';
+import { FindOneOptions } from 'typeorm';
+import { SqliteDatabaseService } from '../database/sqlite/sqlite-database.service';
 import { CreateLinkDto } from './dto/create-link.dto';
+import { LinkEntity } from './entity/link.entity';
 import { MaskedUrl } from './interfaces/masked-url';
 import { LinkModel } from './model/link.model';
-import { FindOneOptions } from 'typeorm';
-import { LinkEntity } from './entity/link.entity';
+import { LinkGeneratorRepository } from './repository/link-generator.repository';
 
 @Injectable({ scope: Scope.REQUEST })
 export class LinkGeneratorService {
   constructor(
     @Inject(REQUEST) private request: Request,
-    private readonly linkRepository: DatabaseService,
+    private readonly linkRepository: LinkGeneratorRepository,
   ) {}
 
   private generateMaskedUrl(maskedUrl: string): string {

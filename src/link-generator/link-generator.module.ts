@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { LinkGeneratorService } from './link-generator.service';
-import { LinkGeneratorController } from './link-generator.controller';
 import { DatabaseModule } from '../database/database.module';
+import { LinkGeneratorController } from './link-generator.controller';
+import { LinkGeneratorService } from './link-generator.service';
 
 @Module({
   imports: [DatabaseModule],

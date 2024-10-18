@@ -1,0 +1,10 @@
+services:
+  mysql:
+    image: mysql:lts
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./mysqldata:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1928374650
+      MYSQL_DATABASE: link

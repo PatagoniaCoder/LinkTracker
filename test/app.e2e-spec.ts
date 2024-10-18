@@ -1,32 +1,24 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { DataSource } from 'typeorm';
 import { AppModule } from '../src/app.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { LinkEntity } from '../src/link-generator/entity/link.entity';
+import { DatabaseModule } from '../src/database/database.module';
+import { TestDatabaseModule } from './test-database.module';
 
 jest.mock('uuid', () => ({ v4: () => 'mokUUID' }));
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
-  let database: DataSource;
   const dto = { url: 'http://example.com' };
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: 'test-links.db',
-          entities: [LinkEntity],
-          synchronize: true,
-        }),
-        AppModule,
-      ],
-    }).compile();
+      imports: [AppModule],
+    })
+      .overrideModule(DatabaseModule)
+      .useModule(TestDatabaseModule)
+      .compile();
 
     app = moduleFixture.createNestApplication();
-    database = app.get(DataSource);
     await app.init();
   });
 
@@ -47,7 +39,7 @@ describe('AppController (e2e)', () => {
       .get(`/link-generator/mokUUID`)
       .expect(302);
 
-    expect(response.header.location).toBe(dto.url);
+    return expect(response.header.location).toBe(dto.url);
   });
 
   it('GET /link-generator/:id/stats -> obtiene estadísticas', async () => {
@@ -55,7 +47,7 @@ describe('AppController (e2e)', () => {
       .get(`/link-generator/mokUUID/stats`)
       .expect(200);
 
-    expect(response.body).toEqual({
+    return expect(response.body).toEqual({
       redirectCount: 1,
       target: dto.url,
     });
@@ -74,7 +66,7 @@ describe('AppController (e2e)', () => {
       .get(`/link-generator/mokUUID/stats`)
       .expect(200);
 
-    expect(statsResponse.body).toEqual({
+    return expect(statsResponse.body).toEqual({
       redirectCount: 0,
       target: dto.url,
     });
@@ -87,7 +79,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('GET /link-generator/:id/stats -> retorna 404 si el link no existe', async () => {
-    await request(app.getHttpServer())
+    return await request(app.getHttpServer())
       .get('/link-generator/fake-id/stats')
       .expect(404);
   });
