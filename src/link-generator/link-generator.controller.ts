@@ -32,7 +32,7 @@ export class LinkGeneratorController {
       prev += `${acc}=${query[acc]}${Object.keys(query)[idx + 1] ? '&' : ''}`;
       return prev;
     }, '');
-    res.redirect(`${originalUrl}?${params}`);
+    res.redirect(`${originalUrl}${params ? '?' + params : ''}`);
   }
 
   @Get(':id/stats')

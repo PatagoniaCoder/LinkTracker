@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LinkEntity } from 'src/link-generator/entity/link.entity';
+import { LinkEntity } from '../link-generator/entity/link.entity';
 import { LinkModel } from 'src/link-generator/model/link.model';
 import { FindOneOptions, Repository } from 'typeorm';
 
