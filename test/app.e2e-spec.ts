@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
@@ -10,6 +10,7 @@ jest.mock('uuid', () => ({ v4: () => 'mokUUID' }));
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   const dto = { url: 'http://example.com' };
+
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -19,10 +20,11 @@ describe('AppController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
     await app.init();
   });
 
-  it('POST /link-generator -> crea un nuevo link', async () => {
+  it('POST /link-generator should crate a new link', async () => {
     return await request(app.getHttpServer())
       .post('/link-generator')
       .send(dto)
@@ -34,26 +36,26 @@ describe('AppController (e2e)', () => {
       });
   });
 
-  it('GET /link-generator/:id -> redirige a la URL original', async () => {
+  it('GET /link-generator/:id -> should redirect to the original URL', async () => {
     const response = await request(app.getHttpServer())
       .get(`/link-generator/mokUUID`)
       .expect(302);
 
-    return expect(response.header.location).toBe(dto.url);
+    expect(response.header.location).toBe(dto.url);
   });
 
-  it('GET /link-generator/:id/stats -> obtiene estadísticas', async () => {
+  it('GET /link-generator/:id/stats -> should get the statistics', async () => {
     const response = await request(app.getHttpServer())
       .get(`/link-generator/mokUUID/stats`)
       .expect(200);
 
-    return expect(response.body).toEqual({
+    expect(response.body).toEqual({
       redirectCount: 1,
       target: dto.url,
     });
   });
 
-  it('PUT /link-generator/:id -> invalida el link', async () => {
+  it('PUT /link-generator/:id -> should invalidate the link', async () => {
     await request(app.getHttpServer())
       .post(`/link-generator`)
       .send(dto)
@@ -66,21 +68,33 @@ describe('AppController (e2e)', () => {
       .get(`/link-generator/mokUUID/stats`)
       .expect(200);
 
-    return expect(statsResponse.body).toEqual({
+    expect(statsResponse.body).toEqual({
       redirectCount: 0,
       target: dto.url,
     });
   });
 
-  it('GET /link-generator/:id -> retorna 404 si el link es inválido', async () => {
-    return await request(app.getHttpServer())
+  it('GET /link-generator/:id -> should return a 404 error when an invalid link is passed.', async () => {
+    await request(app.getHttpServer())
       .get(`/link-generator/fake-id`)
       .expect(404);
   });
 
-  it('GET /link-generator/:id/stats -> retorna 404 si el link no existe', async () => {
-    return await request(app.getHttpServer())
+  it('GET /link-generator/:id/stats -> should return a 404 error if the link does not exist.', async () => {
+    await request(app.getHttpServer())
       .get('/link-generator/fake-id/stats')
       .expect(404);
+  });
+
+  it('POST /link-generator -> should return an error if the URL is invalid', async () => {
+    await request(app.getHttpServer())
+      .post('/link-generator')
+      .send({ url: 'some' })
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .post('/link-generator')
+      .send({ url: 'www.example.com' })
+      .expect(400);
   });
 });

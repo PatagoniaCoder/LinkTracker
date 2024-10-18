@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LinkGeneratorRepository } from '../link-generator/repository/link-generator.repository';
-import { SqliteDatabaseModule } from './sqlite/sqlite-database.module';
-import { SqliteDatabaseService } from './sqlite/sqlite-database.service';
-import { MySqlDatabaseService } from './mysql/mysql-database.service';
 import { MySqlDatabaseModule } from './mysql/mysql-database.module';
+import { MySqlDatabaseService } from './mysql/mysql-database.service';
 
 @Module({
   imports: [MySqlDatabaseModule], // selectable MySqlDatabaseModule,
