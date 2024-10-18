@@ -23,6 +23,12 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
+Siguiendo las especificaciones de la documentación se genero una API-REST utilizando Nestjs.
+Se implemento una base de datos Mysql con la posibilidad de utilizar Sqlite.
+Se genero un docker-compose.yml para la utilización con el fin de aislar la base de datos de Mysql.
+Se agregaron test para asegurar el correcto funcionamiento.
+Se utilizo una arquitectura dinámica para flexibilizar los cambios utilizando interfaces y clases abstractas.
+Si bien la documentación especifica que se puede agregar un parámetro password a la url enmascarada para luego incorporarla a la url original, se recomienda utilizar otros métodos para el envío de información sensible como por ejemplo la utilización de las cabeceras o el uso de cookies de sesión.
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
